@@ -1,0 +1,10 @@
+services:
+  server:
+    build:
+      context: ./
+    networks:
+      - dmp_core_network
+networks:
+  dmp_core_network:
+    driver: bridge
+    external: true
