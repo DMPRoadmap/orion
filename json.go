@@ -25,6 +25,13 @@ func extractDomain(rawurl string) (string, error) {
     return host, nil
 }
 
+// function to generate domain hash
+func hashDomain(domain string) string {
+    hasher := sha256.New()
+    hasher.Write([]byte(domain))
+    return hex.EncodeToString(hasher.Sum(nil))
+}
+
 func main() {
 	filePath := "ror-data.json" // Your JSON file path
 
@@ -95,7 +102,7 @@ func main() {
 					_ = calculated
 					_ = hashString
 					// fmt.Printf("Org #%d, Hash: %s, ID: %s, Calculated %s, Domains %s\n", count, hashString, org.ID, calculated, org.Domains)
-	//				rordb.SaveJSON("/storage", id, raw);
+					rordb.SaveJSON("/storage/orgs", id, raw);
 				} else {
 					// here we should delete the 
 			}
@@ -109,11 +116,31 @@ func main() {
 	if err != nil && err != io.EOF {
 		log.Fatalf("Error reading closing array token: %v", err)
 	}
-	// fmt.Println("All org domains:")
+
+	// print domains
+	fmt.Println("All org domains:")
 	for domain, rorID := range listDomains {
 			fmt.Printf("Domain - ROR: %s - %s\n", domain, rorID)
 	}
 
 	fmt.Printf("Processed %d organizations\n", count)
+
+	// append hashed domains
+	hashedDomains := make(map[string][]string)
+    for domain, rorID := range listDomains {
+        hashedDomain := hashDomain(domain)
+        hashedDomains[hashedDomain] = append(hashedDomains[hashedDomain], rorID...)
+    }
+
+	// // Print out hashed domains
+	// for domain, rorID := range hashedDomains {
+	// 	fmt.Printf("Hashed: %s, ROR IDs: %v\n", domain, rorID)
+	// }
+	
+	//save hashed domains in directory
+	if err := rordb.SaveHashedDomains("/storage/domains", hashedDomains); err != nil {
+		log.Fatalf("Error saving domain data: %v", err)
+	}
+
 
 }
