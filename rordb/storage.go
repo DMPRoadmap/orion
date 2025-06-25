@@ -31,7 +31,7 @@ func SaveJSON(basePath, orgID string, raw json.RawMessage) error {
 
 func SaveHashedDomains(basePath string, domains map[string][]string) error {
     // Iterate through the domain map
-    for domain, rorIDs := range domains {
+    for domain, rorURLs := range domains {
         
         dirPath := filepath.Join(basePath, domain[:2], domain[2:4])
 	    filePath := filepath.Join(dirPath, domain + ".txt")
@@ -40,8 +40,15 @@ func SaveHashedDomains(basePath string, domains map[string][]string) error {
         if err := os.MkdirAll(dirPath, 0755); err != nil {
             return fmt.Errorf("failed to create directory for domain %s: %w", domain, err)
         }
-        
-        // convert the ROR IDs slice into a single string with each ID on a new line
+
+        // Trim "https://ror.org/" prefix from each ROR URL
+        var rorIDs []string
+        for _, url := range rorURLs {
+            id := strings.TrimPrefix(url, "https://ror.org/")
+            rorIDs = append(rorIDs, id)
+        }
+
+        // Join the trimmed IDs with newlines
         data := strings.Join(rorIDs, "\n") + "\n"
 
         // use os.WriteFile to write the data
