@@ -12,10 +12,10 @@ import (
     "encoding/hex"
 )
 
-// RequestData structures the expected JSON payload
-type RequestData struct {
-    Cmd   string `json:"cmd"`
-    Value string `json:"value"`
+// ApiRequestData structures the expected JSON payload
+type ApiRequestData struct {
+    Cmd   string          `json:"cmd"`
+    Value json.RawMessage `json:"value"`  // holds raw JSON — can be string or array
 }
 
 func handleSubmit(w http.ResponseWriter, r *http.Request) {
@@ -31,13 +31,13 @@ func handleSubmit(w http.ResponseWriter, r *http.Request) {
   }
   defer r.Body.Close()
 
-  var requestData RequestData
-  if err := json.Unmarshal(body, &requestData); err != nil {
+  var apiRequestData ApiRequestData
+  if err := json.Unmarshal(body, &apiRequestData); err != nil {
       http.Error(w, "Invalid JSON", http.StatusBadRequest)
       return
   }
 
-  response, err := processCommand(requestData)  // Ensure you capture both the response and error
+  response, err := processCommand(apiRequestData)  // Ensure you capture both the response and error
   if err != nil {
       http.Error(w, err.Error(), http.StatusInternalServerError)
       return
@@ -53,35 +53,61 @@ func handleSubmit(w http.ResponseWriter, r *http.Request) {
   w.Write(jsonResponse)
 }
 
-func processCommand(data RequestData) (interface{}, error) {
-  switch data.Cmd {
-  case "search_by_domain":
-      fmt.Println("Searching by domain:", data.Value)
-      return getOrgId(data.Value)
-  case "search_by_ror_id":
-      fmt.Println("Searching by ROR ID:", data.Value)
-      return getOrgDetails(data.Value)
-  default:
-      return nil, fmt.Errorf("unknown command %s", data.Cmd)
-  }
+func processCommand(data ApiRequestData) (interface{}, error) {
+    switch data.Cmd {
+    case "search_by_domain":
+        var domain string
+        if err := json.Unmarshal(data.Value, &domain); err != nil {
+            return nil, fmt.Errorf("expected a string for domain: %v", err)
+        }
+        fmt.Println("Searching by domain:", domain)
+        return getOrgId(domain)
+
+    case "search_by_ror_id":
+        // Try to parse as array
+        var ids []string
+        if err := json.Unmarshal(data.Value, &ids); err == nil {
+            fmt.Println("Searching by multiple ROR IDs:", ids)
+            return getOrgDetails(ids)
+        }
+
+        // If not an array, try to parse as a single ID
+        var id string
+        if err := json.Unmarshal(data.Value, &id); err != nil {
+            return nil, fmt.Errorf("invalid value for search_by_ror_id: must be string or array")
+        }
+
+        fmt.Println("Searching by single ROR ID:", id)
+        return getOrgDetails([]string{id})
+
+    default:
+        return nil, fmt.Errorf("unknown command %s", data.Cmd)
+    }
 }
 
-func getOrgDetails(rorID string) (interface{}, error) {
-  dirPath := filepath.Join("/storage/orgs", rorID[:2], rorID[2:4])
-	filePath := filepath.Join(dirPath, rorID + ".json")
-  
-  file, err := ioutil.ReadFile(filePath)
-  if err != nil {
-      return nil, fmt.Errorf("error reading file for ROR ID %s: %v", rorID, err)
-  }
+func getOrgDetails(rorIDs []string) (interface{}, error) {
+    var results []interface{}
 
-  var data interface{}
-  if err := json.Unmarshal(file, &data); err != nil {
-      return nil, fmt.Errorf("error parsing JSON file for ROR ID %s: %v", rorID, err)
-  }
+    for _, rorID := range rorIDs {
+        dirPath := filepath.Join("/storage/orgs", rorID[:2], rorID[2:4])
+        filePath := filepath.Join(dirPath, rorID + ".json")
 
-  return []interface{}{data}, nil
+        file, err := ioutil.ReadFile(filePath)
+        if err != nil {
+            return nil, fmt.Errorf("error reading file for ROR ID %s: %v", rorID, err)
+        }
+
+        var data interface{}
+        if err := json.Unmarshal(file, &data); err != nil {
+            return nil, fmt.Errorf("error parsing JSON file for ROR ID %s: %v", rorID, err)
+        }
+
+        results = append(results, data)
+    }
+
+    return results, nil
 }
+
 
 func getOrgId(domain string) (interface{}, error) {
   // Hash the domain
