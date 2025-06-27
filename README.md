@@ -114,19 +114,21 @@ curl -X POST http://localhost:8080/submit \
 ```json
 [
   {
+      ...
     "id": "https://ror.org/rorID1",
     "name": "First Organisation",
-    ...
+     ...
   },
   {
+      ...
     "id": "https://ror.org/rorID2",
     "name": "Second Organisation",
-    ...
+      ...
   }
 ]
 ```
 
-### 📄 License
+### License
 
 This project is licensed under the **GNU Affero General Public License v3.0**.
 
