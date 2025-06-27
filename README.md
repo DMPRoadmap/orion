@@ -35,11 +35,10 @@ docker run -it --rm \
   -w /app \
   -p 8080:8080 \
   orion bash
+
+# then inside the container:
+go run api.go
 ```
-
-Then inside the container:
-
-`go run api.go`
 
 ### Testing the API
 
