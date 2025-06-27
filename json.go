@@ -1,3 +1,5 @@
+// Copyright 2025 Digital Curation Centre (UK) and contributors, Licence AGPLv3
+
 package main
 
 import (
