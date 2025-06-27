@@ -1,3 +1,5 @@
+// Copyright 2025 Digital Curation Centre (UK) and contributors, Licence AGPLv3
+
 package main
 
 import (
@@ -12,7 +14,7 @@ import (
     "encoding/hex"
 )
 
-// ApiRequestData structures the expected JSON payload
+
 type ApiRequestData struct {
     Cmd   string          `json:"cmd"`
     Value json.RawMessage `json:"value"`  // holds raw JSON — can be string or array
@@ -37,7 +39,7 @@ func handleSubmit(w http.ResponseWriter, r *http.Request) {
       return
   }
 
-  response, err := processCommand(apiRequestData)  // Ensure you capture both the response and error
+  response, err := processCommand(apiRequestData)
   if err != nil {
       http.Error(w, err.Error(), http.StatusInternalServerError)
       return
@@ -89,9 +91,11 @@ func getOrgDetails(rorIDs []string) (interface{}, error) {
     var results []interface{}
 
     for _, rorID := range rorIDs {
+        // Build file path
         dirPath := filepath.Join("/storage/orgs", rorID[:2], rorID[2:4])
         filePath := filepath.Join(dirPath, rorID + ".json")
 
+        // Read the file
         file, err := ioutil.ReadFile(filePath)
         if err != nil {
             return nil, fmt.Errorf("error reading file for ROR ID %s: %v", rorID, err)

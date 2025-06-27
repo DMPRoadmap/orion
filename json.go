@@ -11,57 +11,7 @@ import (
 	"log"
 	"os"
 	"orion/rordb" // your package with Organization struct
-	"net/http"
-	"path/filepath"
-	"io/ioutil"
 )
-
-func findFileByName(dir, filename string) (string, error) {
-    files, err := ioutil.ReadDir(dir)
-    if err != nil {
-        return "", err
-    }
-    for _, file := range files {
-        if file.Name() == filename {
-            return filepath.Join(dir, file.Name()), nil
-        }
-    }
-    return "", os.ErrNotExist
-}
-
-func handleRetrieve(w http.ResponseWriter, r *http.Request) {
-    // Get the "text" query parameter
-    text := r.URL.Query().Get("text")
-    if text == "" {
-        http.Error(w, "text parameter is required", http.StatusBadRequest)
-        return
-    }
-
-    var filePath string
-    var err error
-
-    // Determine if the text is likely a domain or an ROR ID based on its length or format
-    if strings.Contains(text, ".") { // Simple check, assuming domains contain a dot
-        hashed := hashDomain(text)
-        filePath, err = findFileByName("/storage/domains", hashed+".txt")
-    } else {
-        filePath, err = findFileByName("/storage/orgs", text+".json")
-    }
-
-    // Check if the file was found
-    if err != nil {
-        http.Error(w, "File not found", http.StatusNotFound)
-        return
-    }
-
-    // Format the success message
-    successMessage := fmt.Sprintf("Success! File exists: %s", filePath)
-    // Write the formatted message as a byte array
-    w.Write([]byte(successMessage))
-
-    // // Serve the file
-    // http.ServeFile(w, r, filePath)
-}
 
 func extractDomain(rawurl string) (string, error) {
     parsed, err := url.Parse(rawurl)
@@ -167,11 +117,11 @@ func main() {
 		log.Fatalf("Error reading closing array token: %v", err)
 	}
 
-	// print domains
-	fmt.Println("All org domains:")
-	for domain, rorURL := range listDomains {
-			fmt.Printf("Domain - ROR: %s - %s\n", domain, rorURL)
-	}
+	// // print domains - logs
+	// fmt.Println("All org domains:")
+	// for domain, rorURL := range listDomains {
+	// 		fmt.Printf("Domain - ROR: %s - %s\n", domain, rorURL)
+	// }
 
 	fmt.Printf("Processed %d organizations\n", count)
 
@@ -182,7 +132,7 @@ func main() {
         hashedDomains[hashedDomain] = append(hashedDomains[hashedDomain], rorURL...)
     }
 
-	// // Print out hashed domains
+	// // print out hashed domains - logs
 	// for domain, rorURL := range hashedDomains {
 	// 	fmt.Printf("Hashed: %s, ROR IDs: %v\n", domain, rorURL)
 	// }
