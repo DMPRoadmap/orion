@@ -1,4 +1,5 @@
-// Copyright 2025 Digital Curation Centre (UK) and contributors, Licence AGPLv3
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright © 2025 Digital Curation Centre (UK) and contributors
 
 package main
 

@@ -71,8 +71,8 @@ curl -X POST http://localhost:8080/submit \
 **Sample Response**
 ```json
 {
-  ids: ["01k9d6864"],
-  orgs: [
+  "ids": ["01k9d6864"],
+  "orgs": [
     {
     ...
 
