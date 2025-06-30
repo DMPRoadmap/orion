@@ -88,7 +88,7 @@ func processCommand(data ApiRequestData) (interface{}, error) {
 }
 
 func getOrgDetails(rorIDs []string) (interface{}, error) {
-    var results []interface{}
+    var result []interface{}
 
     for _, rorID := range rorIDs {
         // Build file path
@@ -106,10 +106,10 @@ func getOrgDetails(rorIDs []string) (interface{}, error) {
             return nil, fmt.Errorf("error parsing JSON file for ROR ID %s: %v", rorID, err)
         }
 
-        results = append(results, data)
+        result = append(result, data)
     }
 
-    return results, nil
+    return result, nil
 }
 
 
@@ -128,10 +128,21 @@ func getOrgId(domain string) (interface{}, error) {
         return nil, fmt.Errorf("error reading file for domain %s: %v", domain, err)
     }
 
-    // Split file content by new lines
-    lines := strings.Split(strings.TrimSpace(string(content)), "\n")
+    rorIDs := strings.Split(strings.TrimSpace(string(content)), "\n")
 
-    return lines, nil
+    // Get org details for those ROR IDs
+    orgDetails, err := getOrgDetails(rorIDs)
+    if err != nil {
+        return nil, fmt.Errorf("error retrieving org details: %v", err)
+    }
+
+    // Construct the final response
+    result := map[string]interface{}{
+        "ids":  rorIDs,
+        "orgs": orgDetails,
+    }
+
+    return result, nil
 }
 
 

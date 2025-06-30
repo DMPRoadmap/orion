@@ -69,8 +69,48 @@ curl -X POST http://localhost:8080/submit \
       }'
 ```
 **Sample Response**
-```
-["01k9d6864"]
+```json
+{
+  ids: ["01k9d6864"],
+  orgs: [
+    {
+    ...
+
+    "id": "https://ror.org/01k9d6864",
+    "links": [
+      {
+        "type": "website",
+        "value": "http://www.dcc.ac.uk/"
+      },
+      {
+        "type": "wikipedia",
+        "value": "https://en.wikipedia.org/wiki/Digital_Curation_Centre"
+      }
+    ],
+
+    ...
+
+    "names": [
+      {
+        "lang": null,
+        "types": [
+          "acronym"
+        ],
+        "value": "DCC"
+      },
+      {
+        "lang": "en",
+        "types": [
+          "ror_display",
+          "label"
+        ],
+        "value": "Digital Curation Centre"
+      }
+    ],
+
+    ...
+  }
+  ]
 ```
 
 #### Test 2: Search by ROR ID
@@ -102,6 +142,26 @@ curl -X POST http://localhost:8080/submit \
       {
         "type": "wikipedia",
         "value": "https://en.wikipedia.org/wiki/Digital_Curation_Centre"
+      }
+    ],
+
+    ...
+
+    "names": [
+      {
+        "lang": null,
+        "types": [
+          "acronym"
+        ],
+        "value": "DCC"
+      },
+      {
+        "lang": "en",
+        "types": [
+          "ror_display",
+          "label"
+        ],
+        "value": "Digital Curation Centre"
       }
     ],
 
@@ -139,6 +199,6 @@ curl -X POST http://localhost:8080/submit \
 ```
 
 ### License
-
 SPDX-License-Identifier: AGPL-3.0-or-later
+
 Copyright © 2025 Digital Curation Centre (UK) and contributors
