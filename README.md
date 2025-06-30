@@ -1,4 +1,15 @@
-## 🚀 Getting Started
+# Orion
+
+Orion (Roadmap ROR Integration) is a lightweight service designed to integrate the [Research Organization Registry](https://ror.org/) (ROR) into systems like [Roadmap](https://github.com/DMPRoadmap/roadmap).
+Built in Go, Orion exposes a simple HTTP API for linking email domains to research organizations.
+
+Built with efficiency and minimal resource consumption in mind, Orion avoids using a traditional database, aligning with principles of sustainable and lightweight infrastructure.
+Instead, it leverages a structured local filesystem-based storage to serve organization records and domain-to-ROR mappings.
+
+This design enables fast, efficient lookups with minimal dependencies and overhead.
+This is ideal for lightweight deployments or containerized environments.
+
+## Getting Started
 
 ### Requirements
 - [Go](https://golang.org/doc/install)
@@ -129,8 +140,5 @@ curl -X POST http://localhost:8080/submit \
 
 ### License
 
-This project is licensed under the **GNU Affero General Public License v3.0**.
-
-You may copy, modify, and distribute this program under the terms of the license as published by the Free Software Foundation.
-
-See the full license text here: [GNU AGPL v3.0](https://www.gnu.org/licenses/agpl-3.0.html)
+SPDX-License-Identifier: AGPL-3.0-or-later
+Copyright © 2025 Digital Curation Centre (UK) and contributors
