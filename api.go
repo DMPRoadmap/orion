@@ -64,14 +64,14 @@ func processCommand(data ApiRequestData) (interface{}, error) {
             return nil, fmt.Errorf("expected a string for domain: %v", err)
         }
         fmt.Println("Searching by domain:", domain)
-        return getOrgId(domain)
+        return getOrgsByDomain(domain)
 
     case "search_by_ror_id":
         // Try to parse as array
         var ids []string
         if err := json.Unmarshal(data.Value, &ids); err == nil {
             fmt.Println("Searching by multiple ROR IDs:", ids)
-            return getOrgDetails(ids)
+            return getOrgsById(ids)
         }
 
         // If not an array, try to parse as a single ID
@@ -81,14 +81,14 @@ func processCommand(data ApiRequestData) (interface{}, error) {
         }
 
         fmt.Println("Searching by single ROR ID:", id)
-        return getOrgDetails([]string{id})
+        return getOrgsById([]string{id})
 
     default:
         return nil, fmt.Errorf("unknown command %s", data.Cmd)
     }
 }
 
-func getOrgDetails(rorIDs []string) (interface{}, error) {
+func getOrgsById(rorIDs []string) (interface{}, error) {
     var result []interface{}
 
     for _, rorID := range rorIDs {
@@ -114,7 +114,7 @@ func getOrgDetails(rorIDs []string) (interface{}, error) {
 }
 
 
-func getOrgId(domain string) (interface{}, error) {
+func getOrgsByDomain(domain string) (interface{}, error) {
   // Hash the domain
   hash := sha256.Sum256([]byte(domain))
   hashedDomain := hex.EncodeToString(hash[:])
@@ -132,7 +132,7 @@ func getOrgId(domain string) (interface{}, error) {
     rorIDs := strings.Split(strings.TrimSpace(string(content)), "\n")
 
     // Get org details for those ROR IDs
-    orgDetails, err := getOrgDetails(rorIDs)
+    orgDetails, err := getOrgsById(rorIDs)
     if err != nil {
         return nil, fmt.Errorf("error retrieving org details: %v", err)
     }
