@@ -14,13 +14,14 @@ This is ideal for lightweight deployments or containerized environments.
 ### Requirements
 - [Go](https://golang.org/doc/install)
 - [Docker](https://docs.docker.com/get-docker/) (optional)
-- Input data to generate ROR records and domain mappings
+- Input data to generate ROR records and domain mappings (download .json file from https://zenodo.org/records/18419061 and rename it to `ror-data.json`)
 
 ### Generate Storage Data
 
 Run the following to build the `/storage` structure used by the API:
 
 ```bash
+docker run -it --rm   -v $HOME/tmp/storage:/storage   -p 8080:8080 -v $(pwd):/app   -w /app   orion   bash
 go run json.go
 ```
 
@@ -202,3 +203,4 @@ curl -X POST http://localhost:8080/submit \
 SPDX-License-Identifier: AGPL-3.0-or-later
 
 Copyright © 2025 Digital Curation Centre (UK) and contributors
+
